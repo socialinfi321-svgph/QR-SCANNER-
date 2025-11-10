@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>QR Tracker</title>
 
 <style>
@@ -13,13 +14,19 @@
   font-family: "Poppins", sans-serif;
 }
 
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+  touch-action: manipulation;
+}
+
 body {
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   background: url('https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_9a143304.jpg') center center / contain no-repeat fixed;
-  background-color: #000; /* black border fill */
+  background-color: #000;
   overflow: hidden;
 }
 
@@ -33,6 +40,7 @@ body {
   align-items: center;
   padding: 15px 10px;
   position: relative;
+  transform-origin: center center;
 }
 
 /* QR Box */
@@ -47,9 +55,10 @@ body {
   justify-content: center;
   align-items: center;
   background: transparent;
+  transform-origin: center center;
 }
 
-/* Continuous glowing border line around QR box */
+/* Continuous glowing border line */
 .qr-box::before {
   content: "";
   position: absolute;
@@ -107,6 +116,7 @@ body {
   opacity: 0;
   transform: translateX(100%);
   transition: opacity 0.3s, transform 0.3s;
+  will-change: transform, opacity;
 }
 
 .qr-box img.active {
@@ -118,22 +128,10 @@ body {
   display: none;
 }
 
-.qr-box img.slide-out {
-  animation: slideOutToBox 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-.qr-box img.slide-in {
-  animation: slideInFromRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-.qr-box img.restore {
-  animation: restoreFromBox 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  display: block !important;
-}
-
+/* smoother animation - no page zoom */
 @keyframes slideOutToBox {
-  0% {opacity: 1; transform: translateX(0) scale(1);}
-  100% {opacity: 1; transform: translateX(-280px) translateY(380px) scale(0.23);}
+  0% {opacity: 1; transform: translate(0,0) scale(1);}
+  100% {opacity: 1; transform: translate(-40px, 60px) scale(0.25);}
 }
 
 @keyframes slideInFromRight {
@@ -142,11 +140,22 @@ body {
 }
 
 @keyframes restoreFromBox {
-  0% {opacity: 1; transform: translateX(-280px) translateY(380px) scale(0.23);}
-  100% {opacity: 1; transform: translateX(0) scale(1);}
+  0% {opacity: 1; transform: translate(-40px, 60px) scale(0.25);}
+  100% {opacity: 1; transform: translate(0,0) scale(1);}
 }
 
-/* Completion text */
+.qr-box img.slide-out {
+  animation: slideOutToBox 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.qr-box img.slide-in {
+  animation: slideInFromRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.qr-box img.restore {
+  animation: restoreFromBox 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  display: block !important;
+}
+
+/* Done text */
 .qr-box.completed::before,
 .qr-box.completed::after {
   display: none;
@@ -225,7 +234,7 @@ body {
   cursor: pointer;
 }
 
-/* Bottom section 10px niche */
+/* Bottom section */
 .bottom {
   display: flex;
   justify-content: space-between;
