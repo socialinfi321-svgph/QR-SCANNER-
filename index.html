@@ -3,10 +3,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport"
-  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>QR Tracker</title>
-
 <style>
 * {
   margin: 0;
@@ -51,7 +49,7 @@ body {
   height: 260px;
   border-radius: 20px;
   overflow: visible;
-  margin: 75px auto 0 auto;
+  margin: 83px auto 0 auto; /* 8px niche shifted */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -303,7 +301,6 @@ body {
 }
 </style>
 </head>
-
 <body>
 <div class="app">
   <div>
@@ -323,7 +320,7 @@ body {
     <div class="complete" id="completeMsg"></div>
     <button class="plus-btn" id="plusBtn">+1</button>
   </div>
-
+  
   <div class="bottom">
     <div style="display:flex; align-items:center;">
       <div class="completed-box" id="completedBox"></div>
@@ -349,10 +346,60 @@ let counts = [0, 0, 0, 0, 0];
 let completedQRs = [];
 let currentQR = 0;
 
+// Load data from localStorage on page load
+function loadData() {
+  const savedCounts = localStorage.getItem('qrCounts');
+  const savedCompleted = localStorage.getItem('completedQRs');
+  const savedCurrent = localStorage.getItem('currentQR');
+  
+  if (savedCounts) counts = JSON.parse(savedCounts);
+  if (savedCompleted) completedQRs = JSON.parse(savedCompleted);
+  if (savedCurrent) currentQR = parseInt(savedCurrent);
+  
+  // Update UI based on loaded data
+  updateQR();
+  
+  // Hide completed QR images
+  qrImages.forEach((img, index) => {
+    if (completedQRs.includes(index)) {
+      img.classList.add('completed');
+    }
+  });
+  
+  // Update completed box with completed QR images
+  completedBox.innerHTML = "";
+  completedQRs.forEach(index => {
+    const clone = qrImages[index].cloneNode(true);
+    clone.classList.remove('active', 'slide-out', 'slide-in', 'completed');
+    clone.style.opacity = "1";
+    clone.style.transform = "none";
+    clone.dataset.originalIndex = index;
+    completedBox.appendChild(clone);
+  });
+  
+  // Set active QR
+  qrImages.forEach(img => img.classList.remove('active'));
+  qrImages[currentQR].classList.add('active');
+  
+  // Check if all QR codes are completed
+  if (completedQRs.length === qrImages.length) {
+    qrBox.classList.add('completed');
+    qrBox.innerHTML = '<div class="done-text">✅ COMPLETED</div>';
+  }
+}
+
+// Save data to localStorage
+function saveData() {
+  localStorage.setItem('qrCounts', JSON.stringify(counts));
+  localStorage.setItem('completedQRs', JSON.stringify(completedQRs));
+  localStorage.setItem('currentQR', currentQR.toString());
+}
+
 function updateQR() {
   dots.forEach((dot, i) => dot.classList.toggle('active', i === currentQR));
   counter.textContent = `${counts[currentQR]} / ${targets[currentQR]}`;
   completeMsg.textContent = counts[currentQR] >= targets[currentQR] ? "🎯 Target Complete!" : "";
+  saveData();
 }
 
 function findNextAvailableQR() {
@@ -367,23 +414,29 @@ plusBtn.addEventListener('click', () => {
   if (counts[currentQR] < targets[currentQR]) {
     counts[currentQR]++;
     updateQR();
+    
     if (counts[currentQR] === targets[currentQR]) {
       completeMsg.textContent = "🎯 Target Complete!";
       completedQRs.push(currentQR);
-      completedBox.innerHTML = "";
+      
+      // Add QR to completed box
       const clone = qrImages[currentQR].cloneNode(true);
       clone.classList.remove('active', 'slide-out', 'slide-in', 'completed');
       clone.style.opacity = "1";
       clone.style.transform = "none";
       clone.dataset.originalIndex = currentQR;
       completedBox.appendChild(clone);
+      
+      // Hide current QR and move to next available
       const currentImg = qrImages[currentQR];
       let nextQR = findNextAvailableQR();
+      
       if (nextQR !== currentQR) {
         const nextImg = qrImages[nextQR];
         currentImg.classList.remove('active');
         currentImg.classList.add('slide-out');
         nextImg.classList.add('slide-in');
+        
         setTimeout(() => {
           currentImg.classList.remove('slide-out');
           currentImg.classList.add('completed');
@@ -393,6 +446,7 @@ plusBtn.addEventListener('click', () => {
           updateQR();
         }, 600);
       } else {
+        // All QR codes completed
         qrBox.classList.add('completed');
         qrBox.innerHTML = '<div class="done-text">✅ COMPLETED</div>';
       }
@@ -401,21 +455,35 @@ plusBtn.addEventListener('click', () => {
 });
 
 completedBox.addEventListener('click', () => {
-  const imgInBox = completedBox.querySelector('img');
-  if (!imgInBox) return;
-  const originalIndex = parseInt(imgInBox.dataset.originalIndex);
+  const imagesInBox = completedBox.querySelectorAll('img');
+  if (imagesInBox.length === 0) return;
+  
+  // Get the last completed QR (LIFO)
+  const lastImg = imagesInBox[imagesInBox.length - 1];
+  const originalIndex = parseInt(lastImg.dataset.originalIndex);
+  
+  // Remove from completedQRs array
   completedQRs = completedQRs.filter(i => i !== originalIndex);
+  
+  // Remove from completed box
+  lastImg.remove();
+  
+  // Reset counter for this QR
+  counts[originalIndex] = 0;
+  
+  // Show QR in main box
   qrBox.classList.remove('completed');
   qrBox.innerHTML = '';
   qrImages.forEach(img => qrBox.appendChild(img));
+  
   qrImages[currentQR].classList.remove('active');
   qrImages[originalIndex].classList.remove('completed');
   qrImages[originalIndex].classList.add('restore');
+  
   setTimeout(() => {
     qrImages[originalIndex].classList.remove('restore');
     qrImages[originalIndex].classList.add('active');
     currentQR = originalIndex;
-    completedBox.innerHTML = "";
     updateQR();
   }, 600);
 });
@@ -448,20 +516,32 @@ resetBtn.addEventListener('click', () => {
   completedBox.innerHTML = "";
   qrBox.classList.remove('completed');
   qrBox.innerHTML = '';
+  
   qrImages.forEach(img => {
     img.classList.remove('active', 'completed', 'slide-out', 'slide-in', 'restore');
     img.style.opacity = "0";
     img.style.transform = "translateX(100%)";
     qrBox.appendChild(img);
   });
+  
   qrImages[0].classList.add('active');
   qrImages[0].style.opacity = "1";
   qrImages[0].style.transform = "translateX(0)";
+  
   updateQR();
   completeMsg.textContent = "🔄 Data Reset!";
   setTimeout(() => (completeMsg.textContent = ""), 2000);
+  
+  // Clear localStorage
+  localStorage.removeItem('qrCounts');
+  localStorage.removeItem('completedQRs');
+  localStorage.removeItem('currentQR');
 });
-updateQR();
+
+// Initialize the app
+loadData();
 </script>
 </body>
 </html>
+
+
