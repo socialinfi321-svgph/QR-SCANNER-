@@ -6,227 +6,303 @@
 <title>QR Tracker</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:"Poppins",sans-serif;}
-body{
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:url('https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_9a143304.jpg') no-repeat center center fixed;
-  background-size:cover;
-  overflow:hidden;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
-.app{
-  width:90%;
-  max-width:380px;
-  height:90vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 10px;
-  position:relative;
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url('https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_9a143304.jpg') center center / contain no-repeat fixed;
+  background-color: #000; /* black border fill */
+  overflow: hidden;
 }
-h2{
-  text-align:center;
-  font-size:18px;
-  font-weight:700;
-  color:white;
-  text-shadow:0 1px 4px rgba(0,0,0,0.5);
-  margin-bottom:8px;
+
+.app {
+  width: 90%;
+  max-width: 380px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 10px;
+  position: relative;
 }
 
 /* QR Box */
-.qr-box{
-  position:relative;
-  width:260px;
-  height:260px;
-  border:2px solid transparent;
-  border-radius:20px;
-  overflow:hidden;
-  margin:20px auto 0 auto; /* 20px niche kiya */
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:rgba(255,255,255,0.05);
+.qr-box {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  border-radius: 20px;
+  overflow: visible;
+  margin: 75px auto 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
 }
 
-/* Border ke glow ke liye */
-.qr-box::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:20px;
-  border:3px solid transparent;
-  background:conic-gradient(#4285f4,#ea4335,#fbbc05,#34a853,#4285f4);
-  mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-  animation:borderRotate 3s linear infinite;
-  padding:2px;
-}
-@keyframes borderRotate {
-  from{transform:rotate(0deg);}
-  to{transform:rotate(360deg);}
+/* Continuous glowing border line around QR box */
+.qr-box::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #4285f4, #ea4335, #fbbc05, #34a853, #4285f4);
+  background-size: 300% 300%;
+  animation: moveBorder 3s linear infinite;
+  z-index: 0;
+  padding: 3px;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  box-shadow: 0 0 15px rgba(255,255,255,0.5);
 }
 
-.qr-box img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  position:absolute;
-  opacity:0;
-  transform:translateX(100%);
-  transition:all 0.5s ease;
+@keyframes moveBorder {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
 }
-.qr-box img.active{
-  opacity:1;
-  transform:translateX(0);
+
+/* Soft outer glow */
+.qr-box::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 25px;
+  background: conic-gradient(
+    from 0deg,
+    #4285f4,
+    #ea4335,
+    #fbbc05,
+    #34a853,
+    #4285f4
+  );
+  filter: blur(20px);
+  opacity: 0.6;
+  animation: glowSpin 6s linear infinite;
+  z-index: 0;
 }
-.qr-box img.slide-out-left{
-  transform:translateX(-100%);
-  opacity:0;
+
+@keyframes glowSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* QR Images */
+.qr-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  border-radius: 20px;
+  z-index: 2;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.qr-box img.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.qr-box img.completed {
+  display: none;
+}
+
+.qr-box img.slide-out {
+  animation: slideOutToBox 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.qr-box img.slide-in {
+  animation: slideInFromRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.qr-box img.restore {
+  animation: restoreFromBox 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  display: block !important;
+}
+
+@keyframes slideOutToBox {
+  0% {opacity: 1; transform: translateX(0) scale(1);}
+  100% {opacity: 1; transform: translateX(-280px) translateY(380px) scale(0.23);}
+}
+
+@keyframes slideInFromRight {
+  0% {opacity: 1; transform: translateX(100%);}
+  100% {opacity: 1; transform: translateX(0);}
+}
+
+@keyframes restoreFromBox {
+  0% {opacity: 1; transform: translateX(-280px) translateY(380px) scale(0.23);}
+  100% {opacity: 1; transform: translateX(0) scale(1);}
+}
+
+/* Completion text */
+.qr-box.completed::before,
+.qr-box.completed::after {
+  display: none;
+}
+
+.qr-box .done-text {
+  position: absolute;
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #34a853, #fbbc05, #ea4335, #4285f4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientMove 3s linear infinite;
+  z-index: 5;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0%; }
+  100% { background-position: 100%; }
 }
 
 /* Dots */
-.dots{
-  display:flex;
-  justify-content:center;
-  margin-top:8px;
-  gap:6px;
+.dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+  gap: 8px;
+  position: relative;
 }
-.dots span{
-  width:10px;
-  height:10px;
-  background:#fff; /* sab white */
-  border-radius:50%;
-  transition:background 0.3s;
+
+.dots span {
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-radius: 50%;
+  transition: background 0.3s;
+  cursor: pointer;
 }
-.dots span.active{background:#000;} /* active black */
+
+.dots .active {
+  background: #000;
+  transform: scale(1.3);
+}
 
 /* Counter + Message */
-.counter{
-  color:white;
-  font-size:14px;
-  margin-top:10px;
-  font-weight:500;
-  text-align:center;
-}
-.complete{
-  text-align:center;
-  color:#0f9d58;
-  font-weight:700;
-  font-size:13px;
-  margin-top:5px;
+.counter {
+  color: white;
+  font-size: 14px;
+  margin-top: 10px;
+  font-weight: 500;
+  text-align: center;
 }
 
-/* +1 Button Center */
-.plus-btn{
-  margin:18px auto 0 auto; /* thoda niche aur center */
-  padding:10px 30px;
-  border:none;
-  border-radius:12px;
-  color:white;
-  background:linear-gradient(90deg,#4285f4,#ea4335,#fbbc05,#34a853);
-  background-size:400%;
-  animation:gradientMove 6s infinite linear;
-  font-size:16px;
-  font-weight:600;
-  display:block;
-}
-@keyframes gradientMove{
-  0%{background-position:0%;}
-  100%{background-position:100%;}
+.complete {
+  text-align: center;
+  color: #0f9d58;
+  font-weight: 700;
+  font-size: 13px;
+  margin-top: 5px;
 }
 
-/* Bottom Section */
-.bottom{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  width:100%;
-  padding:0 10px;
-  position:relative;
-  bottom:10px; /* bottom elements ko thoda upar liya */
+/* +1 Button */
+.plus-btn {
+  margin: 28px auto 0 auto;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  background: linear-gradient(90deg, #4285f4, #ea4335, #fbbc05, #34a853);
+  background-size: 400%;
+  animation: gradientMove 6s infinite linear;
+  font-size: 16px;
+  font-weight: 600;
+  display: block;
+  cursor: pointer;
 }
 
-/* Completed box */
-.completed-box{
-  width:60px;
-  height:60px;
-  border-radius:10px;
-  background:rgba(255,255,255,0.2);
-  overflow:hidden;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  position:relative;
-  margin-bottom:10px; /* thoda upar frame se andar */
-}
-.completed-box img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  position:absolute;
-  opacity:0;
-  transition:opacity 0.4s;
-}
-.completed-box img.active{opacity:1;}
-
-/* Buttons */
-.change-btn{
-  background:#1a73e8;
-  border:none;
-  color:white;
-  border-radius:50%;
-  width:30px;
-  height:30px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin-left:8px;
-  cursor:pointer;
-}
-.next-btn{
-  background:#34a853;
-  border:none;
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  color:white;
-  font-size:22px;
-  cursor:pointer;
-  box-shadow:0 5px 10px rgba(0,0,0,0.2);
+/* Bottom section 10px niche */
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 10px;
+  position: relative;
+  margin-bottom: 60px;
 }
 
-/* Animations */
-.slide-to-small{
-  animation:moveToSmall 0.6s ease forwards;
+.completed-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.2);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s;
 }
-@keyframes moveToSmall{
-  0%{transform:scale(1)translateY(0);opacity:1;}
-  100%{transform:scale(0.3)translateY(180px);opacity:0;}
+
+.completed-box:hover {
+  transform: scale(1.05);
 }
-.scale-up{
-  animation:scaleUp 0.6s ease forwards;
+
+.completed-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.4s;
 }
-@keyframes scaleUp{
-  0%{transform:scale(0.3)translateY(180px);opacity:0;}
-  100%{transform:scale(1)translateY(0);opacity:1;}
+
+.completed-box img.active { opacity: 1; }
+
+.change-btn {
+  background: #f44336;
+  border: none;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.next-btn {
+  background: #1a73e8;
+  border: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 }
 </style>
 </head>
+
 <body>
 <div class="app">
   <div>
-    <h2>SCAN QR BY GOOGLE</h2>
     <div class="qr-box" id="qrBox">
-      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_b6c5c5c4.jpg" class="active" alt="QR 1">
-      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.30_6098032b.jpg" alt="QR 2">
-      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.31_1a42bf05.jpg" alt="QR 3">
-      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.31_fa882b2d.jpg" alt="QR 4">
-      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/IMG_20251103_172517.png" alt="QR 5">
+      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_b6c5c5c4.jpg" class="active" alt="QR 1" data-index="0">
+      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.30_6098032b.jpg" alt="QR 2" data-index="1">
+      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.31_1a42bf05.jpg" alt="QR 3" data-index="2">
+      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.31_fa882b2d.jpg" alt="QR 4" data-index="3">
+      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/IMG_20251103_172517.png" alt="QR 5" data-index="4">
     </div>
 
     <div class="dots" id="dots">
@@ -241,117 +317,140 @@ h2{
   <div class="bottom">
     <div style="display:flex; align-items:center;">
       <div class="completed-box" id="completedBox"></div>
-      <button class="change-btn" id="changeBtn">&#9658;</button>
+      <button class="change-btn" id="resetBtn">&#8635;</button>
     </div>
     <button class="next-btn" id="nextBtn">&#9654;</button>
   </div>
 </div>
 
 <script>
-const qrImages=document.querySelectorAll('.qr-box img');
-const dots=document.querySelectorAll('#dots span');
-const counter=document.getElementById('counter');
-const completeMsg=document.getElementById('completeMsg');
-const plusBtn=document.getElementById('plusBtn');
-const nextBtn=document.getElementById('nextBtn');
-const completedBox=document.getElementById('completedBox');
-const changeBtn=document.getElementById('changeBtn');
+let qrImages = document.querySelectorAll('.qr-box img');
+let dots = document.querySelectorAll('#dots span');
+let counter = document.getElementById('counter');
+let completeMsg = document.getElementById('completeMsg');
+let plusBtn = document.getElementById('plusBtn');
+let nextBtn = document.getElementById('nextBtn');
+let completedBox = document.getElementById('completedBox');
+let resetBtn = document.getElementById('resetBtn');
+let qrBox = document.getElementById('qrBox');
 
-const targets=[8,8,8,8,4];
-const counts=[0,0,0,0,0];
-let completed=[];
-let currentQR=0;
-let showCompletedIndex=0;
+const targets = [8, 8, 8, 8, 4];
+let counts = [0, 0, 0, 0, 0];
+let completedQRs = [];
+let currentQR = 0;
 
-// Reset after 24 hours
-const lastReset=localStorage.getItem('lastReset');
-if(!lastReset||Date.now()-lastReset>86400000){
-  localStorage.setItem('lastReset',Date.now());
-  localStorage.removeItem('counts');
-  localStorage.removeItem('completed');
+function updateQR() {
+  dots.forEach((dot, i) => dot.classList.toggle('active', i === currentQR));
+  counter.textContent = `${counts[currentQR]} / ${targets[currentQR]}`;
+  completeMsg.textContent = counts[currentQR] >= targets[currentQR] ? "🎯 Target Complete!" : "";
 }
-const savedCounts=JSON.parse(localStorage.getItem('counts'))||counts;
-const savedCompleted=JSON.parse(localStorage.getItem('completed'))||[];
-for(let i=0;i<counts.length;i++)counts[i]=savedCounts[i];
-completed=[...savedCompleted];
 
-function updateQR(){
-  qrImages.forEach((img,i)=>{
-    img.classList.remove('active','slide-out-left');
-    dots[i].classList.remove('active');
-  });
-  let availableIndexes=qrImages.length-completed.length;
-  if(availableIndexes===0){
-    completeMsg.textContent="🎯 All QR Completed!";
-    return;
+function findNextAvailableQR() {
+  for (let i = 1; i <= qrImages.length; i++) {
+    const nextIndex = (currentQR + i) % qrImages.length;
+    if (!completedQRs.includes(nextIndex)) return nextIndex;
   }
-  qrImages[currentQR].classList.add('active');
-  dots[currentQR].classList.add('active');
-  counter.textContent=`${counts[currentQR]} / ${targets[currentQR]}`;
-  completeMsg.textContent=counts[currentQR]>=targets[currentQR]?"🎯 Target Complete!":"";
-  localStorage.setItem('counts',JSON.stringify(counts));
-  localStorage.setItem('completed',JSON.stringify(completed));
+  return currentQR;
 }
 
-plusBtn.addEventListener('click',()=>{
-  if(counts[currentQR]<targets[currentQR]){
+plusBtn.addEventListener('click', () => {
+  if (counts[currentQR] < targets[currentQR]) {
     counts[currentQR]++;
-    counter.textContent=`${counts[currentQR]} / ${targets[currentQR]}`;
-    if(counts[currentQR]===targets[currentQR]){
-      completeMsg.textContent="🎯 Target Complete!";
-      if(!completed.includes(currentQR)){
-        qrImages[currentQR].classList.add('slide-to-small');
-        setTimeout(()=>{
-          completed.push(currentQR);
-          addToCompletedBox(qrImages[currentQR].src);
-          qrImages[currentQR].classList.remove('slide-to-small','active');
-          nextQR();
-        },600);
+    updateQR();
+    if (counts[currentQR] === targets[currentQR]) {
+      completeMsg.textContent = "🎯 Target Complete!";
+      completedQRs.push(currentQR);
+      completedBox.innerHTML = "";
+      const clone = qrImages[currentQR].cloneNode(true);
+      clone.classList.remove('active', 'slide-out', 'slide-in', 'completed');
+      clone.style.opacity = "1";
+      clone.style.transform = "none";
+      clone.dataset.originalIndex = currentQR;
+      completedBox.appendChild(clone);
+      const currentImg = qrImages[currentQR];
+      let nextQR = findNextAvailableQR();
+      if (nextQR !== currentQR) {
+        const nextImg = qrImages[nextQR];
+        currentImg.classList.remove('active');
+        currentImg.classList.add('slide-out');
+        nextImg.classList.add('slide-in');
+        setTimeout(() => {
+          currentImg.classList.remove('slide-out');
+          currentImg.classList.add('completed');
+          nextImg.classList.remove('slide-in');
+          nextImg.classList.add('active');
+          currentQR = nextQR;
+          updateQR();
+        }, 600);
+      } else {
+        qrBox.classList.add('completed');
+        qrBox.innerHTML = '<div class="done-text">✅ COMPLETED</div>';
       }
     }
-    localStorage.setItem('counts',JSON.stringify(counts));
-    localStorage.setItem('completed',JSON.stringify(completed));
   }
 });
 
-function addToCompletedBox(src){
-  const img=document.createElement('img');
-  img.src=src;
-  if(completedBox.children.length===0)img.classList.add('active');
-  completedBox.appendChild(img);
-}
-
-function nextQR(){
-  do{
-    currentQR=(currentQR+1)%qrImages.length;
-  }while(completed.includes(currentQR)&&completed.length<qrImages.length);
-  updateQR();
-}
-
-nextBtn.addEventListener('click',()=>{
-  qrImages[currentQR].classList.add('slide-out-left');
-  setTimeout(()=>{nextQR();},400);
+completedBox.addEventListener('click', () => {
+  const imgInBox = completedBox.querySelector('img');
+  if (!imgInBox) return;
+  const originalIndex = parseInt(imgInBox.dataset.originalIndex);
+  completedQRs = completedQRs.filter(i => i !== originalIndex);
+  qrBox.classList.remove('completed');
+  qrBox.innerHTML = '';
+  qrImages.forEach(img => qrBox.appendChild(img));
+  qrImages[currentQR].classList.remove('active');
+  qrImages[originalIndex].classList.remove('completed');
+  qrImages[originalIndex].classList.add('restore');
+  setTimeout(() => {
+    qrImages[originalIndex].classList.remove('restore');
+    qrImages[originalIndex].classList.add('active');
+    currentQR = originalIndex;
+    completedBox.innerHTML = "";
+    updateQR();
+  }, 600);
 });
 
-changeBtn.addEventListener('click',()=>{
-  const imgs=completedBox.querySelectorAll('img');
-  if(imgs.length===0)return;
-  imgs.forEach(img=>img.classList.remove('active'));
-  showCompletedIndex=(showCompletedIndex+1)%imgs.length;
-  imgs[showCompletedIndex].classList.add('active');
+nextBtn.addEventListener('click', () => {
+  let nextQR = findNextAvailableQR();
+  if (nextQR !== currentQR) {
+    qrImages[currentQR].classList.remove('active');
+    qrImages[nextQR].classList.add('active');
+    currentQR = nextQR;
+    updateQR();
+  }
 });
 
-document.getElementById('dots').addEventListener('click',(e)=>{
-  if(e.target.tagName==='SPAN'){
-    const index=[...dots].indexOf(e.target);
-    if(!completed.includes(index)){
+dots.forEach((dot, i) => {
+  dot.addEventListener('click', () => {
+    if (!completedQRs.includes(i)) {
       qrImages[currentQR].classList.remove('active');
-      currentQR=index;
+      currentQR = i;
+      qrImages[currentQR].classList.add('active');
       updateQR();
     }
-  }
+  });
 });
 
+resetBtn.addEventListener('click', () => {
+  counts = [0, 0, 0, 0, 0];
+  completedQRs = [];
+  currentQR = 0;
+  completedBox.innerHTML = "";
+  qrBox.classList.remove('completed');
+  qrBox.innerHTML = '';
+  qrImages.forEach(img => {
+    img.classList.remove('active', 'completed', 'slide-out', 'slide-in', 'restore');
+    img.style.opacity = "0";
+    img.style.transform = "translateX(100%)";
+    qrBox.appendChild(img);
+  });
+  qrImages[0].classList.add('active');
+  qrImages[0].style.opacity = "1";
+  qrImages[0].style.transform = "translateX(0)";
+  updateQR();
+  completeMsg.textContent = "🔄 Data Reset!";
+  setTimeout(() => (completeMsg.textContent = ""), 2000);
+});
 updateQR();
 </script>
 </body>
