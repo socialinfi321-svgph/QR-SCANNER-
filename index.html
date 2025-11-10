@@ -1,492 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>QR Tracker</title>
+
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-  body{
-    min-height:100vh;display:flex;align-items:center;justify-content:center;
-    background:url('https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_9a143304.jpg') center/cover no-repeat;
-    padding:20px;
-  }
-
-  .app{
-    width:360px; height:640px; background:rgba(255,255,255,0.92); border-radius:22px;
-    box-shadow:0 12px 40px rgba(10,10,20,0.28); overflow:hidden; display:flex;flex-direction:column;
-    padding:18px;
-    backdrop-filter: blur(5px);
-  }
-
-  .head { text-align:center; margin-bottom:6px; }
-  .head .title { font-size:36px; font-weight:800; letter-spacing:1px; color:#0d47a1; }
-  .head .subtitle { font-size:13px; font-weight:700; color:#374151; margin-top:4px; opacity:0.9; }
-
-  .qr-box{
-    width:280px;height:280px;margin:14px auto;border-radius:18px;border:3px solid #1a237e;overflow:hidden;
-    position:relative;background:#f6f7fb;
-  }
-  .qr-box .placeholder{
-    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#6b7280;font-weight:600;
-  }
-
-  .qr-img{
-    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:translateX(100%);
-    transition:transform .45s cubic-bezier(.2,.9,.2,1),opacity .35s ease;
-  }
-  .qr-img.active{opacity:1; transform:translateX(0);}
-  .qr-img.slide-out-left{transform:translateX(-120%);opacity:0;}
-  .qr-img.scale-zoom{ transform: scale(1.06); transition: transform .25s ease; }
-
-  .dots{ text-align:center; margin-top:10px; }
-  .dots span{ width:10px;height:10px;margin:0 5px;display:inline-block;border-radius:50%;background:#d1d5db;transition:background .2s; }
-  .dots span.active{ background:#1a73e8; transform:scale(1.05); }
-
-  .counter{ text-align:center;margin-top:10px;font-weight:700;color:#111827; }
-  .completeMsg{ text-align:center;margin-top:6px;color:#0f9d58;font-weight:800; font-size:13px; min-height:18px; }
-
-  .plus-btn{ display:block;margin:12px auto;padding:10px 26px;border-radius:12px;border:none; cursor:pointer;
-    font-weight:700;font-size:15px;color:white;background:linear-gradient(90deg,#4285f4,#34a853); box-shadow:0 6px 18px rgba(66,133,244,0.18);
-  }
-
-  .bottom { display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-bottom:6px; }
-  .leftGroup{ display:flex; align-items:center; gap:10px; }
-  .completed-box{
-    width:66px;height:66px;border-radius:12px;background:#f1f3f4;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;
-  }
-  .completed-box img{ position:absolute; inset:0;width:100%;height:100%;object-fit:cover;opacity:0; transition:opacity .28s ease, transform .45s ease; }
-  .completed-box img.active{opacity:1; transform:scale(1);}
-
-  .change-btn{ width:34px;height:34px;border-radius:50%;border:none;background:#1a73e8;color:white;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer; }
-  .next-btn{ width:66px;height:66px;border-radius:50%;border:none;background:#34a853;color:white;font-weight:900; font-size:20px; cursor:pointer; box-shadow:0 8px 20px rgba(52,168,83,0.18); }
-
-  /* Animations for moving to small */
-  .move-anim{
-    animation: moveToSmall .65s cubic-bezier(.2,.85,.2,1) forwards;
-  }
-  @keyframes moveToSmall{
-    0% { transform: translateY(0) scale(1); opacity:1; }
-    60% { transform: translateY(40px) scale(1.08); opacity:0.95; }
-    100%{ transform: translateY(180px) scale(.28); opacity:0; }
-  }
-  .appear-from-small{ animation: appearFromSmall .6s cubic-bezier(.2,.85,.2,1) forwards; }
-  @keyframes appearFromSmall{
-    0% { transform: translateY(180px) scale(.28); opacity:0; }
-    60% { transform: translateY(20px) scale(1.06); opacity:1; }
-    100%{ transform: translateY(0) scale(1); opacity:1; }
-  }
-
-  /* small-screen tweaks */
-  @media (max-width:420px){
-    .app{ width:94%; height:92vh; padding:14px; }
-    .qr-box{ width:92%; height:60vw; }
-  }
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Poppins",sans-serif;}
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:url('https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_9a143304.jpg') no-repeat center center/cover;
+}
+.app{
+  width:90%;
+  max-width:380px;
+  height:90vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 10px;
+}
+h2{
+  text-align:center;
+  font-size:18px;
+  font-weight:700;
+  color:white;
+  text-shadow:0 1px 4px rgba(0,0,0,0.5);
+  margin-bottom:8px;
+}
+.qr-box{
+  position:relative;
+  width:260px;
+  height:260px;
+  border:2px solid transparent;
+  border-radius:20px;
+  overflow:hidden;
+  margin:0 auto;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:rgba(255,255,255,0.05);
+}
+.qr-box::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:20px;
+  border:2px solid;
+  border-image:linear-gradient(90deg,#4285f4,#ea4335,#fbbc05,#34a853) 1;
+  animation:glowMove 3s linear infinite;
+}
+@keyframes glowMove{
+  0%{border-image:linear-gradient(0deg,#4285f4,#ea4335,#fbbc05,#34a853)1;}
+  100%{border-image:linear-gradient(360deg,#34a853,#fbbc05,#ea4335,#4285f4)1;}
+}
+.qr-box img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  position:absolute;
+  opacity:0;
+  transform:translateX(100%);
+  transition:all 0.5s ease;
+}
+.qr-box img.active{
+  opacity:1;
+  transform:translateX(0);
+}
+.qr-box img.slide-out-left{
+  transform:translateX(-100%);
+  opacity:0;
+}
+.dots{
+  display:flex;
+  justify-content:center;
+  margin-top:8px;
+  gap:6px;
+}
+.dots span{
+  width:10px;
+  height:10px;
+  background:#ccc;
+  border-radius:50%;
+  transition:background 0.3s;
+}
+.dots span.active{background:#1a73e8;}
+.counter{
+  color:white;
+  font-size:14px;
+  margin-top:10px;
+  font-weight:500;
+  text-align:center;
+}
+.complete{
+  text-align:center;
+  color:#0f9d58;
+  font-weight:700;
+  font-size:13px;
+  margin-top:5px;
+}
+.plus-btn{
+  margin:12px auto;
+  padding:8px 24px;
+  border:none;
+  border-radius:10px;
+  color:white;
+  background:linear-gradient(90deg,#4285f4,#ea4335,#fbbc05,#34a853);
+  background-size:400%;
+  animation:gradientMove 6s infinite linear;
+  font-size:16px;
+  font-weight:600;
+}
+@keyframes gradientMove{
+  0%{background-position:0%;}
+  100%{background-position:100%;}
+}
+.bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  width:100%;
+  padding:0 10px;
+}
+.completed-box{
+  width:60px;
+  height:60px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.2);
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+}
+.completed-box img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  position:absolute;
+  opacity:0;
+  transition:opacity 0.4s;
+}
+.completed-box img.active{opacity:1;}
+.change-btn{
+  background:#1a73e8;
+  border:none;
+  color:white;
+  border-radius:50%;
+  width:30px;
+  height:30px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin-left:8px;
+  cursor:pointer;
+}
+.next-btn{
+  background:#34a853;
+  border:none;
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  color:white;
+  font-size:22px;
+  cursor:pointer;
+  box-shadow:0 5px 10px rgba(0,0,0,0.2);
+}
+.slide-to-small{
+  animation:moveToSmall 0.6s ease forwards;
+}
+@keyframes moveToSmall{
+  0%{transform:scale(1)translateY(0);opacity:1;}
+  100%{transform:scale(0.3)translateY(180px);opacity:0;}
+}
+.scale-up{
+  animation:scaleUp 0.6s ease forwards;
+}
+@keyframes scaleUp{
+  0%{transform:scale(0.3)translateY(180px);opacity:0;}
+  100%{transform:scale(1)translateY(0);opacity:1;}
+}
 </style>
 </head>
 <body>
-  <div class="app">
-    <div class="head">
-  
-      <div class="subtitle">SCAN QR by Google Lens</div>
-    </div>
-
+<div class="app">
+  <div>
+    <h2>SCAN QR BY GOOGLE</h2>
     <div class="qr-box" id="qrBox">
-      <div class="placeholder" id="placeholder" style="display:none">All targets completed 🎉</div>
-
-      <!-- images will be in DOM; we keep them all but control which are active.
-           NOTE: using absolute links from your GitHub as requested -->
-      <img class="qr-img" data-id="0" src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_b6c5c5c4.jpg" alt="QR 1" />
-      <img class="qr-img" data-id="1" src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.30_6098032b.jpg" alt="QR 2" />
-      <img class="qr-img" data-id="2" src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.31_1a42bf05.jpg" alt="QR 3" />
-      <img class="qr-img" data-id="3" src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.31_fa882b2d.jpg" alt="QR 4" />
-      <img class="qr-img" data-id="4" src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/IMG_20251103_172517.png" alt="QR 5" />
+      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_b6c5c5c4.jpg" class="active" alt="QR 1">
+      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.30_6098032b.jpg" alt="QR 2">
+      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.31_1a42bf05.jpg" alt="QR 3">
+      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.31_fa882b2d.jpg" alt="QR 4">
+      <img src="https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/IMG_20251103_172517.png" alt="QR 5">
     </div>
 
-    <div class="dots" id="dots"></div>
+    <div class="dots" id="dots">
+      <span class="active"></span><span></span><span></span><span></span><span></span>
+    </div>
 
     <div class="counter" id="counter">0 / 8</div>
-    <div class="completeMsg" id="completeMsg"></div>
-
+    <div class="complete" id="completeMsg"></div>
     <button class="plus-btn" id="plusBtn">+1</button>
-
-    <div class="bottom">
-      <div class="leftGroup">
-        <div class="completed-box" id="completedBox" title="Completed QR (double-click to send back)">
-          <!-- completed thumbnails appended here -->
-        </div>
-        <button class="change-btn" id="changeBtn" title="Cycle completed / Double-click to send back">&#9658;</button>
-      </div>
-
-      <button class="next-btn" id="nextBtn" title="Next uncompleted">&#9654;</button>
-    </div>
   </div>
 
+  <div class="bottom">
+    <div style="display:flex; align-items:center;">
+      <div class="completed-box" id="completedBox"></div>
+      <button class="change-btn" id="changeBtn">&#9658;</button>
+    </div>
+    <button class="next-btn" id="nextBtn">&#9654;</button>
+  </div>
+</div>
+
 <script>
-/* ---------- configuration ---------- */
-const QR_ITEMS = [
-  { src: "https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_b6c5c5c4.jpg", target: 8 },
-  { src: "https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.30_6098032b.jpg", target: 8 },
-  { src: "https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.31_1a42bf05.jpg", target: 8 },
-  { src: "https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.31_fa882b2d.jpg", target: 8 },
-  { src: "https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/IMG_20251103_172517.png", target: 4 }
-];
+const qrImages=document.querySelectorAll('.qr-box img');
+const dots=document.querySelectorAll('#dots span');
+const counter=document.getElementById('counter');
+const completeMsg=document.getElementById('completeMsg');
+const plusBtn=document.getElementById('plusBtn');
+const nextBtn=document.getElementById('nextBtn');
+const completedBox=document.getElementById('completedBox');
+const changeBtn=document.getElementById('changeBtn');
 
-const STORAGE_KEY = 'qr-tracker-state-v1';
-const RESET_PERIOD_MS = 24 * 60 * 60 * 1000; // 24 hours
+const targets=[8,8,8,8,4];
+const counts=[0,0,0,0,0];
+let completed=[];
+let currentQR=0;
+let showCompletedIndex=0;
 
-/* ---------- state ---------- */
-let state = {
-  counts: Array(QR_ITEMS.length).fill(0),
-  completed: [],        // array of indexes moved to completed
-  currentUncompletedIndex: 0,
-  lastResetAt: Date.now()
-};
-
-/* ---------- DOM refs ---------- */
-const qrImgs = Array.from(document.querySelectorAll('.qr-img'));
-const dotsWrap = document.getElementById('dots');
-const counterEl = document.getElementById('counter');
-const completeMsgEl = document.getElementById('completeMsg');
-const plusBtn = document.getElementById('plusBtn');
-const nextBtn = document.getElementById('nextBtn');
-const completedBox = document.getElementById('completedBox');
-const changeBtn = document.getElementById('changeBtn');
-const placeholder = document.getElementById('placeholder');
-
-let showCompletedIndex = 0;
-let lastTap = 0;
-let changeBtnLastTap = 0;
-
-/* ---------- persistence & reset check ---------- */
-function loadState(){
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) { saveState(); return; }
-    const parsed = JSON.parse(raw);
-    // reset if older than 24h
-    if(parsed.lastResetAt && (Date.now() - parsed.lastResetAt) > RESET_PERIOD_MS){
-      resetAll();
-      return;
-    }
-    state = Object.assign(state, parsed);
-  } catch(e){
-    console.warn('Load state failed', e);
-    saveState();
-  }
+// Reset after 24 hours
+const lastReset=localStorage.getItem('lastReset');
+if(!lastReset||Date.now()-lastReset>86400000){
+  localStorage.setItem('lastReset',Date.now());
+  localStorage.removeItem('counts');
+  localStorage.removeItem('completed');
 }
+const savedCounts=JSON.parse(localStorage.getItem('counts'))||counts;
+const savedCompleted=JSON.parse(localStorage.getItem('completed'))||[];
+for(let i=0;i<counts.length;i++)counts[i]=savedCounts[i];
+completed=[...savedCompleted];
 
-function saveState(){
-  state.lastResetAt = state.lastResetAt || Date.now();
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
-function resetAll(){
-  state.counts = Array(QR_ITEMS.length).fill(0);
-  state.completed = [];
-  state.currentUncompletedIndex = 0;
-  state.lastResetAt = Date.now();
-  saveState();
-  renderAll();
-}
-
-/* ---------- helpers ---------- */
-function getUncompletedIndexes(){
-  const all = QR_ITEMS.map((_,i)=>i);
-  return all.filter(i => !state.completed.includes(i));
-}
-
-function getCurrentUncompleted(){
-  const list = getUncompletedIndexes();
-  if(list.length === 0) return null;
-  // ensure index in range
-  if(state.currentUncompletedIndex >= list.length) state.currentUncompletedIndex = 0;
-  return list[state.currentUncompletedIndex];
-}
-
-/* ---------- render ---------- */
-function buildDots(){
-  dotsWrap.innerHTML = '';
-  const list = getUncompletedIndexes();
-  list.forEach((origIdx, idx)=>{
-    const span = document.createElement('span');
-    span.dataset.orig = origIdx;
-    if(idx === state.currentUncompletedIndex) span.classList.add('active');
-    span.addEventListener('click', ()=> {
-      // set that as current and animate to it
-      state.currentUncompletedIndex = idx;
-      saveState();
-      showUncompletedWithSlide(origIdx);
-      renderAll();
-    });
-    dotsWrap.appendChild(span);
+function updateQR(){
+  qrImages.forEach((img,i)=>{
+    img.classList.remove('active','slide-out-left');
+    dots[i].classList.remove('active');
   });
-}
-
-function renderBigBox(){
-  // hide all images first
-  qrImgs.forEach(img => img.classList.remove('active','slide-out-left','scale-zoom','appear-from-small'));
-  const cur = getCurrentUncompleted();
-  if(cur === null){
-    placeholder.style.display = 'flex';
+  let availableIndexes=qrImages.length-completed.length;
+  if(availableIndexes===0){
+    completeMsg.textContent="🎯 All QR Completed!";
     return;
-  } else {
-    placeholder.style.display = 'none';
   }
-  // find matching img element by data-id (orig index)
-  const element = qrImgs.find(i => Number(i.dataset.id) === cur);
-  if(!element) return;
-  element.classList.add('active');
-  counterEl.textContent = `${state.counts[cur]} / ${QR_ITEMS[cur].target}`;
-  completeMsgEl.textContent = state.counts[cur] >= QR_ITEMS[cur].target ? "🎯 Target Complete!" : "";
+  qrImages[currentQR].classList.add('active');
+  dots[currentQR].classList.add('active');
+  counter.textContent=`${counts[currentQR]} / ${targets[currentQR]}`;
+  completeMsg.textContent=counts[currentQR]>=targets[currentQR]?"🎯 Target Complete!":"";
+  localStorage.setItem('counts',JSON.stringify(counts));
+  localStorage.setItem('completed',JSON.stringify(completed));
 }
 
-function renderCompletedBox(){
-  completedBox.innerHTML = '';
-  state.completed.forEach((origIdx, idx)=>{
-    const timg = document.createElement('img');
-    timg.src = QR_ITEMS[origIdx].src;
-    timg.dataset.orig = origIdx;
-    if(idx === showCompletedIndex) timg.classList.add('active');
-    completedBox.appendChild(timg);
-  });
-  // adjust showCompletedIndex if out of range
-  if(state.completed.length === 0) showCompletedIndex = 0;
-  else showCompletedIndex = showCompletedIndex % state.completed.length;
-}
-
-/* main render */
-function renderAll(){
-  buildDots();
-  renderBigBox();
-  renderCompletedBox();
-  // update dots active class
-  const dots = Array.from(dotsWrap.children);
-  dots.forEach((d, i) => {
-    d.classList.toggle('active', i === state.currentUncompletedIndex);
-  });
-  saveState();
-}
-
-/* ---------- interactions ---------- */
-function showUncompletedWithSlide(origIndex){
-  // create slide out animation for current big image then bring new
-  const currentElem = document.querySelector('.qr-img.active');
-  if(currentElem){
-    currentElem.classList.add('slide-out-left');
-    setTimeout(()=> currentElem.classList.remove('slide-out-left','active'), 380);
-  }
-  // mark new currentUncompletedIndex according to list
-  const list = getUncompletedIndexes();
-  const idxInList = list.indexOf(origIndex);
-  if(idxInList >= 0) state.currentUncompletedIndex = idxInList;
-  saveState();
-
-  // add appear-from-small to the target element to give hotstar-like entry
-  const newElem = qrImgs.find(i => Number(i.dataset.id) === origIndex);
-  if(newElem){
-    setTimeout(()=>{
-      newElem.classList.add('appear-from-small','active');
-      setTimeout(()=> newElem.classList.remove('appear-from-small'), 650);
-      // update counter text shortly after
-      setTimeout(()=> {
-        counterEl.textContent = `${state.counts[origIndex]} / ${QR_ITEMS[origIndex].target}`;
-        completeMsgEl.textContent = state.counts[origIndex] >= QR_ITEMS[origIndex].target ? "🎯 Target Complete!" : "";
-      }, 200);
-    }, 160);
-  }
-  // update dots highlight
-  renderAll();
-}
-
-/* +1 logic with animation to small when completed */
-plusBtn.addEventListener('click', ()=>{
-  const cur = getCurrentUncompleted();
-  if(cur === null) return;
-  if(state.counts[cur] < QR_ITEMS[cur].target){
-    state.counts[cur]++;
-    // small pop on the big image
-    const bigEl = qrImgs.find(i => Number(i.dataset.id) === cur);
-    if(bigEl){
-      bigEl.classList.add('scale-zoom');
-      setTimeout(()=> bigEl.classList.remove('scale-zoom'), 300);
-    }
-    counterEl.textContent = `${state.counts[cur]} / ${QR_ITEMS[cur].target}`;
-    if(state.counts[cur] >= QR_ITEMS[cur].target){
-      completeMsgEl.textContent = "🎯 Target Complete!";
-      // animate to small box: zoom then move
-      if(!state.completed.includes(cur)){
-        const imgEl = qrImgs.find(i => Number(i.dataset.id) === cur);
-        if(imgEl){
-          imgEl.classList.add('move-anim');
-          // after animation add to completed and remove from big view
-          setTimeout(()=>{
-            imgEl.classList.remove('move-anim','active');
-            // push to completed
-            state.completed.push(cur);
-            // automatically move to next uncompleted
-            const uncompleted = getUncompletedIndexes();
-            if(uncompleted.length > 0){
-              // pick next uncompleted index (if current was at position p, next will be p mod newLength)
-              let currentListIndex = state.currentUncompletedIndex;
-              // remove current from the list view: since we use indexes dynamically, simply keep currentUncompletedIndex same
-              // but ensure it doesn't exceed new length
-              state.currentUncompletedIndex = Math.max(0, Math.min(currentListIndex, getUncompletedIndexes().length - 1));
-            } else {
-              // none left
-              state.currentUncompletedIndex = 0;
-            }
-            saveState();
-            renderAll();
-          }, 650);
-        } else {
-          // fallback: just mark completed
-          state.completed.push(cur);
-          renderAll();
-        }
+plusBtn.addEventListener('click',()=>{
+  if(counts[currentQR]<targets[currentQR]){
+    counts[currentQR]++;
+    counter.textContent=`${counts[currentQR]} / ${targets[currentQR]}`;
+    if(counts[currentQR]===targets[currentQR]){
+      completeMsg.textContent="🎯 Target Complete!";
+      if(!completed.includes(currentQR)){
+        qrImages[currentQR].classList.add('slide-to-small');
+        setTimeout(()=>{
+          completed.push(currentQR);
+          addToCompletedBox(qrImages[currentQR].src);
+          qrImages[currentQR].classList.remove('slide-to-small','active');
+          nextQR();
+        },600);
       }
     }
-    saveState();
+    localStorage.setItem('counts',JSON.stringify(counts));
+    localStorage.setItem('completed',JSON.stringify(completed));
   }
 });
 
-/* next button -> go to next uncompleted */
-nextBtn.addEventListener('click', ()=>{
-  const list = getUncompletedIndexes();
-  if(list.length === 0) return;
-  state.currentUncompletedIndex = (state.currentUncompletedIndex + 1) % list.length;
-  const targetOrig = list[state.currentUncompletedIndex];
-  showUncompletedWithSlide(targetOrig);
-});
-
-/* completedBox interactions:
-   - single click on changeBtn cycles thumbnails
-   - double click on changeBtn moves current completed back to uncompleted
-   - double click on completed thumbnail also moves it back
-*/
-changeBtn.addEventListener('click', (e)=>{
-  const now = Date.now();
-  if(now - changeBtnLastTap < 300){
-    // double click -> move back to big box
-    sendCompletedBackToBig();
-    changeBtnLastTap = 0;
-    return;
-  }
-  changeBtnLastTap = now;
-  // single click: cycle
-  setTimeout(()=>{
-    if(Date.now() - changeBtnLastTap >= 300){ // confirmed single click
-      const completedList = state.completed;
-      if(completedList.length === 0) return;
-      showCompletedIndex = (showCompletedIndex + 1) % completedList.length;
-      renderCompletedBox();
-      changeBtnLastTap = 0;
-    }
-  }, 310);
-});
-
-/* double-click/double-tap on completed-box image to send back */
-completedBox.addEventListener('dblclick', (e)=>{
-  // find which thumbnail is active
-  sendCompletedBackToBig();
-});
-
-/* click on completed box cycles too (single click) */
-completedBox.addEventListener('click', (e)=>{
-  const imgs = completedBox.querySelectorAll('img');
-  if(imgs.length === 0) return;
-  // identify clicked thumbnail index
-  let clickedIndex = Array.from(imgs).indexOf(e.target);
-  if(clickedIndex === -1){
-    // not on image, treat as cycle
-    showCompletedIndex = (showCompletedIndex + 1) % imgs.length;
-    renderCompletedBox();
-    return;
-  }
-  // if clicked the currently shown, treat as double tap logic: handled by dblclick
-  if(clickedIndex !== showCompletedIndex){
-    showCompletedIndex = clickedIndex;
-    renderCompletedBox();
-  }
-});
-
-/* function to move a completed-thumbnail back to big (uncompleted):
-   remove from state.completed, reset its count to 0, and make it current uncompleted with appear animation
-*/
-function sendCompletedBackToBig(){
-  if(state.completed.length === 0) return;
-  const orig = state.completed[showCompletedIndex];
-  // remove from completed array
-  state.completed = state.completed.filter(i => i !== orig);
-  // reset counter
-  state.counts[orig] = 0;
-  // make it the current uncompleted index (wherever it sits in uncompleted list)
-  const uncompletedList = getUncompletedIndexes();
-  // we want this item to be first shown: so set currentUncompletedIndex to position of orig in uncompleted list after removal
-  // but since we just removed it from completed, it is now in uncompletedList
-  const pos = uncompletedList.indexOf(orig);
-  state.currentUncompletedIndex = pos >= 0 ? pos : 0;
-
-  // animate: create a temporary img in completedBox to animate into big box for effect
-  const temp = document.createElement('img');
-  temp.src = QR_ITEMS[orig].src;
-  temp.style.position = 'absolute';
-  temp.style.width = '100%';
-  temp.style.height = '100%';
-  temp.style.objectFit = 'cover';
-  temp.style.left = '0';
-  temp.style.top = '0';
-  temp.classList.add('active');
-  // attach to completedBox to use CSS animation appearFromSmall when inserted in big box
-  temp.classList.add('active');
-  // remove any current active small imgs to avoid flicker
-  renderCompletedBox();
-  saveState();
-
-  // give a small delay so DOM updates, then show big box with appear-from-small animation
-  setTimeout(()=>{
-    // ensure big img element corresponding to orig gets appearFromSmall class
-    const bigEl = qrImgs.find(i => Number(i.dataset.id) === orig);
-    if(bigEl){
-      bigEl.classList.add('appear-from-small','active');
-      setTimeout(()=> bigEl.classList.remove('appear-from-small'), 700);
-    }
-    renderAll();
-    saveState();
-  }, 80);
+function addToCompletedBox(src){
+  const img=document.createElement('img');
+  img.src=src;
+  if(completedBox.children.length===0)img.classList.add('active');
+  completedBox.appendChild(img);
 }
 
-/* tap dots to jump handled in buildDots */
+function nextQR(){
+  do{
+    currentQR=(currentQR+1)%qrImages.length;
+  }while(completed.includes(currentQR)&&completed.length<qrImages.length);
+  updateQR();
+}
 
-/* initial load & reset check: if stored state older than 24h, reset */
-(function init(){
-  loadState();
-  // If lastResetAt missing or too old, resetAll() already handles in loadState
-  renderAll();
-  // Attach a periodic check to auto-reset at boundary (optional safety)
-  setInterval(()=>{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return;
-    try {
-      const parsed = JSON.parse(raw);
-      if(parsed.lastResetAt && (Date.now() - parsed.lastResetAt) > RESET_PERIOD_MS){
-        resetAll();
-      }
-    } catch(e){}
-  }, 60*1000); // every minute
-})();
+nextBtn.addEventListener('click',()=>{
+  qrImages[currentQR].classList.add('slide-out-left');
+  setTimeout(()=>{nextQR();},400);
+});
 
-/* small nicety: keyboard left/right for testing on desktop */
-document.addEventListener('keydown', (e)=>{
-  if(e.key === 'ArrowRight') nextBtn.click();
-  if(e.key === 'ArrowLeft'){
-    // previous uncompleted
-    const list = getUncompletedIndexes();
-    if(list.length === 0) return;
-    state.currentUncompletedIndex = (state.currentUncompletedIndex - 1 + list.length) % list.length;
-    showUncompletedWithSlide(list[state.currentUncompletedIndex]);
+changeBtn.addEventListener('click',()=>{
+  const imgs=completedBox.querySelectorAll('img');
+  if(imgs.length===0)return;
+  imgs.forEach(img=>img.classList.remove('active'));
+  showCompletedIndex=(showCompletedIndex+1)%imgs.length;
+  imgs[showCompletedIndex].classList.add('active');
+});
+
+document.getElementById('dots').addEventListener('click',(e)=>{
+  if(e.target.tagName==='SPAN'){
+    const index=[...dots].indexOf(e.target);
+    if(!completed.includes(index)){
+      qrImages[currentQR].classList.remove('active');
+      currentQR=index;
+      updateQR();
+    }
   }
 });
+
+updateQR();
 </script>
 </body>
 </html>
