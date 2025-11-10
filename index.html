@@ -12,7 +12,9 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  background:url('https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_9a143304.jpg') no-repeat center center/cover;
+  background:url('https://raw.githubusercontent.com/socialinfi321-svgph/QR-SCANNER-/main/WhatsApp%20Image%202025-11-10%20at%2017.46.29_9a143304.jpg') no-repeat center center fixed;
+  background-size:cover;
+  overflow:hidden;
 }
 .app{
   width:90%;
@@ -23,6 +25,7 @@ body{
   justify-content:space-between;
   align-items:center;
   padding:15px 10px;
+  position:relative;
 }
 h2{
   text-align:center;
@@ -32,6 +35,8 @@ h2{
   text-shadow:0 1px 4px rgba(0,0,0,0.5);
   margin-bottom:8px;
 }
+
+/* QR Box */
 .qr-box{
   position:relative;
   width:260px;
@@ -39,25 +44,33 @@ h2{
   border:2px solid transparent;
   border-radius:20px;
   overflow:hidden;
-  margin:0 auto;
+  margin:20px auto 0 auto; /* 20px niche kiya */
   display:flex;
   justify-content:center;
   align-items:center;
   background:rgba(255,255,255,0.05);
 }
+
+/* Border ke glow ke liye */
 .qr-box::before{
   content:"";
   position:absolute;
   inset:0;
   border-radius:20px;
-  border:2px solid;
-  border-image:linear-gradient(90deg,#4285f4,#ea4335,#fbbc05,#34a853) 1;
-  animation:glowMove 3s linear infinite;
+  border:3px solid transparent;
+  background:conic-gradient(#4285f4,#ea4335,#fbbc05,#34a853,#4285f4);
+  mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  animation:borderRotate 3s linear infinite;
+  padding:2px;
 }
-@keyframes glowMove{
-  0%{border-image:linear-gradient(0deg,#4285f4,#ea4335,#fbbc05,#34a853)1;}
-  100%{border-image:linear-gradient(360deg,#34a853,#fbbc05,#ea4335,#4285f4)1;}
+@keyframes borderRotate {
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
 }
+
 .qr-box img{
   width:100%;
   height:100%;
@@ -75,6 +88,8 @@ h2{
   transform:translateX(-100%);
   opacity:0;
 }
+
+/* Dots */
 .dots{
   display:flex;
   justify-content:center;
@@ -84,11 +99,13 @@ h2{
 .dots span{
   width:10px;
   height:10px;
-  background:#ccc;
+  background:#fff; /* sab white */
   border-radius:50%;
   transition:background 0.3s;
 }
-.dots span.active{background:#1a73e8;}
+.dots span.active{background:#000;} /* active black */
+
+/* Counter + Message */
 .counter{
   color:white;
   font-size:14px;
@@ -103,29 +120,38 @@ h2{
   font-size:13px;
   margin-top:5px;
 }
+
+/* +1 Button Center */
 .plus-btn{
-  margin:12px auto;
-  padding:8px 24px;
+  margin:18px auto 0 auto; /* thoda niche aur center */
+  padding:10px 30px;
   border:none;
-  border-radius:10px;
+  border-radius:12px;
   color:white;
   background:linear-gradient(90deg,#4285f4,#ea4335,#fbbc05,#34a853);
   background-size:400%;
   animation:gradientMove 6s infinite linear;
   font-size:16px;
   font-weight:600;
+  display:block;
 }
 @keyframes gradientMove{
   0%{background-position:0%;}
   100%{background-position:100%;}
 }
+
+/* Bottom Section */
 .bottom{
   display:flex;
   justify-content:space-between;
   align-items:center;
   width:100%;
   padding:0 10px;
+  position:relative;
+  bottom:10px; /* bottom elements ko thoda upar liya */
 }
+
+/* Completed box */
 .completed-box{
   width:60px;
   height:60px;
@@ -136,6 +162,7 @@ h2{
   justify-content:center;
   align-items:center;
   position:relative;
+  margin-bottom:10px; /* thoda upar frame se andar */
 }
 .completed-box img{
   width:100%;
@@ -146,6 +173,8 @@ h2{
   transition:opacity 0.4s;
 }
 .completed-box img.active{opacity:1;}
+
+/* Buttons */
 .change-btn{
   background:#1a73e8;
   border:none;
@@ -170,6 +199,8 @@ h2{
   cursor:pointer;
   box-shadow:0 5px 10px rgba(0,0,0,0.2);
 }
+
+/* Animations */
 .slide-to-small{
   animation:moveToSmall 0.6s ease forwards;
 }
